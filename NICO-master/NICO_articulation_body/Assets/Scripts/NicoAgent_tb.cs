@@ -24,7 +24,6 @@ public class NicoAgentTomas : Agent
     private List<float> initial_changes = new List<float>();
     private List<float> changes = new List<float>();
 
-
     public GameObject target;
     public GameObject effector;
     
