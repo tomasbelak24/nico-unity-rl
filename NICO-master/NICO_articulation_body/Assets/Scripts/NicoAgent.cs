@@ -280,4 +280,20 @@ public class NicoAgent : Agent
         AddReward(got_closer_reward + proximity_reward + movement_reward);
     }
 
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        // control the arm with keyboard input
+
+        var continuousActionsOut = actionsOut.ContinuousActions;
+
+        continuousActionsOut[0] = Input.GetAxis("Horizontal");
+        continuousActionsOut[1] = Input.GetAxis("Vertical");
+        continuousActionsOut[2] = Input.GetAxis("Jump");
+        continuousActionsOut[3] = Input.GetAxis("Fire1");
+        continuousActionsOut[4] = Input.GetAxis("Fire2");
+        continuousActionsOut[5] = Input.GetAxis("Fire3");
+        continuousActionsOut[6] = Input.GetAxis("Mouse X");
+        continuousActionsOut[7] = Input.GetAxis("Mouse Y");
+    }
+
 }

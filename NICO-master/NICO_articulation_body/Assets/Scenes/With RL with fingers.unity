@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.37311554, g: 0.38073874, b: 0.3587339, a: 1}
+  m_IndirectSpecularColor: {r: 0.3731152, g: 0.38073796, b: 0.35873365, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2968,7 +2968,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: NICO
   TeamId: 0
   m_UseChildSensors: 1
@@ -3845,7 +3845,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.010564874, y: 0.080745645, z: -0.0060833977}
+  m_ParentAnchorPosition: {x: 0.010564881, y: 0.080745645, z: -0.0060833977}
   m_ParentAnchorRotation: {x: 0.111243695, y: 0.6983015, z: -0.11124368, w: 0.6983015}
   m_AnchorPosition: {x: -0.031502634, y: -0.095497504, z: 0.0000076719125}
   m_AnchorRotation: {x: 0.11124368, y: 0.69830143, z: -0.111243665, w: 0.69830143}
@@ -4420,7 +4420,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.03565185, y: 0.034840953, z: 0.057352494}
+  m_ParentAnchorPosition: {x: 0.035651866, y: 0.034840953, z: 0.057352494}
   m_ParentAnchorRotation: {x: -0.36596617, y: 0.20958517, z: 0.086569116, w: 0.90257895}
   m_AnchorPosition: {x: -0.022356117, y: -0.071559995, z: -0.0444125}
   m_AnchorRotation: {x: -0.36596614, y: 0.20958515, z: 0.08656911, w: 0.90257883}
@@ -4604,7 +4604,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.0070076096, y: 0.0053596245, z: 0.003396888}
+  m_ParentAnchorPosition: {x: 0.0070076254, y: 0.0053596245, z: 0.003396888}
   m_ParentAnchorRotation: {x: -0.34025842, y: 0.22599703, z: 0.08461045, w: 0.9088405}
   m_AnchorPosition: {x: -0.018833485, y: -0.06177597, z: -0.040571168}
   m_AnchorRotation: {x: -0.3402584, y: 0.225997, z: 0.08461044, w: 0.90884036}
@@ -4712,7 +4712,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.00518966, y: 0.07901621, z: -0.003556613}
+  m_ParentAnchorPosition: {x: 0.005189668, y: 0.07901621, z: -0.003556613}
   m_ParentAnchorRotation: {x: 0.09395891, y: 0.7008365, z: -0.06548352, w: 0.7040682}
   m_AnchorPosition: {x: -0.024010018, y: -0.06629472, z: -0.007670396}
   m_AnchorRotation: {x: 0.09395889, y: 0.7008364, z: -0.06548351, w: 0.7040681}
@@ -4850,7 +4850,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.010351594, y: 0.07665521, z: 0.001769524}
+  m_ParentAnchorPosition: {x: 0.010351601, y: 0.07665521, z: 0.001769524}
   m_ParentAnchorRotation: {x: 0.11455188, y: 0.69776636, z: -0.0865708, w: 0.7017874}
   m_AnchorPosition: {x: -0.030699143, y: -0.10007812, z: -0.0012020603}
   m_AnchorRotation: {x: 0.114551865, y: 0.6977663, z: -0.08657079, w: 0.70178735}
@@ -5294,7 +5294,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.029698469, y: 0.047542106, z: 0.056314666}
+  m_ParentAnchorPosition: {x: 0.029698499, y: 0.047542106, z: 0.056314666}
   m_ParentAnchorRotation: {x: -0.3989103, y: 0.21050094, z: 0.09461812, w: 0.8874726}
   m_AnchorPosition: {x: -0.0260976, y: -0.080229536, z: -0.06137988}
   m_AnchorRotation: {x: -0.39891025, y: 0.21050091, z: 0.094618104, w: 0.8874725}
@@ -5402,7 +5402,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.0057287333, y: 0.08089308, z: -0.002013092}
+  m_ParentAnchorPosition: {x: 0.0057287356, y: 0.08089308, z: -0.002013092}
   m_ParentAnchorRotation: {x: 0.07693753, y: 0.70290875, z: -0.07693752, w: 0.70290875}
   m_AnchorPosition: {x: -0.02998845, y: -0.07281611, z: 0.000007923373}
   m_AnchorRotation: {x: 0.07693752, y: 0.7029087, z: -0.07693751, w: 0.7029087}
@@ -5738,7 +5738,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.0054859673, y: 0.07575764, z: -0.010526899}
+  m_ParentAnchorPosition: {x: 0.005485971, y: 0.07575764, z: -0.010526899}
   m_ParentAnchorRotation: {x: 0.07105169, y: 0.70352805, z: -0.14012378, w: 0.693084}
   m_AnchorPosition: {x: -0.035168566, y: -0.09954999, z: 0.014847782}
   m_AnchorRotation: {x: 0.07105168, y: 0.703528, z: -0.14012377, w: 0.69308394}
@@ -5887,7 +5887,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.035374843, y: 0.27446547, z: 0.20258868}
+  m_ParentAnchorPosition: {x: 0.035374846, y: 0.27446547, z: 0.20258868}
   m_ParentAnchorRotation: {x: -0.1626416, y: 0.31143, z: 0.76815665, w: 0.5352521}
   m_AnchorPosition: {x: -0.06978559, y: 0.058627542, z: -0.14131528}
   m_AnchorRotation: {x: -0.16264158, y: 0.31142998, z: 0.7681565, w: 0.53525203}
@@ -6025,7 +6025,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.0074966266, y: 0.60232544, z: -0.010456489}
+  m_ParentAnchorPosition: {x: -0.007496627, y: 0.60232544, z: -0.010456489}
   m_ParentAnchorRotation: {x: 0.061703376, y: 0.70440954, z: -0.06170337, w: 0.70440954}
   m_AnchorPosition: {x: -0.023050591, y: -0.07910318, z: -0.0000006786766}
   m_AnchorRotation: {x: 0.06170337, y: 0.7044095, z: -0.06170336, w: 0.7044095}
@@ -6549,7 +6549,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.011116424, y: 0.5999546, z: 0.20046332}
+  m_ParentAnchorPosition: {x: 0.011116425, y: 0.5999546, z: 0.20046332}
   m_ParentAnchorRotation: {x: 0.09942839, y: 0.70008147, z: -0.056507092, w: 0.70484537}
   m_AnchorPosition: {x: -0.029649079, y: -0.07562711, z: -0.008494218}
   m_AnchorRotation: {x: 0.09942838, y: 0.7000814, z: -0.056507085, w: 0.7048453}
@@ -6886,7 +6886,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.014692355, y: 0.5912386, z: -0.22482404}
+  m_ParentAnchorPosition: {x: -0.014692357, y: 0.5912386, z: -0.22482404}
   m_ParentAnchorRotation: {x: 0.023263209, y: 0.70672405, z: -0.10898313, w: 0.6986578}
   m_AnchorPosition: {x: -0.026248163, y: -0.07007728, z: 0.009285326}
   m_AnchorRotation: {x: 0.023263207, y: 0.706724, z: -0.108983114, w: 0.69865775}
@@ -7061,7 +7061,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0.0052055004, y: 0.08010647, z: -0.012314441}
+  m_ParentAnchorPosition: {x: 0.0052055027, y: 0.08010647, z: -0.012314441}
   m_ParentAnchorRotation: {x: 0.051726934, y: 0.7066882, z: -0.12404064, w: 0.694644}
   m_AnchorPosition: {x: -0.029103508, y: -0.07299461, z: 0.0047780764}
   m_AnchorRotation: {x: 0.051726926, y: 0.70668817, z: -0.124040626, w: 0.6946439}

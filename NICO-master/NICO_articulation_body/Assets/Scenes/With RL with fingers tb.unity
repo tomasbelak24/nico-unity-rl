@@ -1571,9 +1571,8 @@ GameObject:
   - component: {fileID: 4257976326658113947}
   - component: {fileID: 4257976326658113948}
   - component: {fileID: 4257976326658113951}
-  - component: {fileID: 4257976326658113950}
-  - component: {fileID: 4257976326658113949}
   - component: {fileID: 4257976326658113952}
+  - component: {fileID: 4257976326658113949}
   m_Layer: 12
   m_Name: nico
   m_TagString: Untagged
@@ -2151,8 +2150,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 240105479259805329}
-  - {fileID: 1572529292321880391}
   - {fileID: 4641933888786632079}
+  - {fileID: 1572529292321880391}
   - {fileID: 5495629668691446351}
   - {fileID: 8267383517252704705}
   m_Father: {fileID: 0}
@@ -2926,25 +2925,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DecisionPeriod: 4
   TakeActionsBetweenDecisions: 1
---- !u!114 &4257976326658113950
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2312495711605055567}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb00e32535969e14790b55ff1930e269, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 5000
-  constrain_fingers: 1
-  target: {fileID: 1276655842489041850}
-  effector: {fileID: 5134498394221943540}
 --- !u!114 &4257976326658113951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2958,19 +2938,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 15
+    VectorObservationSize: 4
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 12
+      m_NumContinuousActions: 1
       BranchSizes: 
-    VectorActionSize: 0c000000
+    VectorActionSize: 01000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: NICO
+  m_BehaviorName: Shoulder
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -2987,8 +2967,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  effector: {fileID: 0}
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  NICO: {fileID: 4257976326658113948}
+  maxStepsPerEpisode: 5000
+  target: {fileID: 1276655842489041850}
+  indexFingertip: {fileID: 5134498394221943540}
 --- !u!23 &4306621707624661894
 MeshRenderer:
   m_ObjectHideFlags: 0

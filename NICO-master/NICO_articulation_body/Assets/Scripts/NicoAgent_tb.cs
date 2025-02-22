@@ -1,92 +1,163 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
-public class NicoAgentTomas : Agent
+public class ShoulderAgent : Agent
 {
-
-    // -------------------------------------
-    // 1. Fields & References
-    // -------------------------------------
-    // a) Articulation references
-    // b) Finger constraint settings
-    // c) Stored initial states (targets, positions, velocities)
-    // d) Lists or arrays to hold incremental changes
-    // e) Variables for limiting joint angle updates
-    // f) Distance metrics, etc.
-
-    public ArticulationBody nico;
-
-    private List<float> initial_targets = new List<float>();
-    private List<float> initial_positions = new List<float>();
-    private List<float> initial_velocities = new List<float>();
-    private List<float> targets = new List<float>();
-    private List<float> initial_changes = new List<float>();
-    private List<float> changes = new List<float>();
-
-    public GameObject target;
-    public GameObject effector;
+    public ArticulationBody NICO;
+    private ArticulationBody shoulder;
+    //public int maxStepsPerEpisode;
     
-    private List<float> upperLimits = new List<float>();
-    private List<float> lowerLimits = new List<float>();
+    [Tooltip("The target object")]
+    public GameObject target;
+    Vector3 defaultTargetPosition;
+    
+    [Tooltip("End effector")]
+    public GameObject indexFingertip;
+
+    private float lowerLimit;
+    private float upperLimit;
+
     private float prevDistance;
 
-    // -------------------------------------
-    // 2. Initialize()
-    // -------------------------------------
-    // - Called by ML-Agents once per agent (at scene load)
-    // - Good place to:
-    //   1. Fetch all articulation bodies and their indices
-    //   2. Retrieve and store joint limits (lowerLimit, upperLimit)
-    //   3. Capture initial drive targets, positions, velocities
-    //   4. Identify finger bones (tag-based or name-based)
-    //   5. Set up dof_ind (if you’re automatically mapping DOFs)
-    // - This is a one-time setup that persists across episodes.
+    private float initial_target_angle;
+    private float target_angle;
+    private float change;
 
-    // -------------------------------------
-    // 3. OnEpisodeBegin()
-    // -------------------------------------
-    // - Called before each episode
-    // - Resets environment and agent to known start states
-    //   1. Optionally randomize the target’s position/rotation
-    //   2. Reset the agent’s joint positions, velocities, and drive targets to initial values
-    //   3. Reset incremental changes (if using incremental updates)
-    //   4. Reinitialize any distance-based variables (like last_dist = initial distance)
+    //private int stepCounter = 0;
 
-    // -------------------------------------
-    // 4. CollectObservations(VectorSensor sensor)
-    // -------------------------------------
-    // - Feeds observation data to the neural network
-    //   1. Current joint targets or angles
-    //   2. Relative positions (e.g., distance from effector to target)
-    //   3. Possibly velocities or orientation info
-    //   4. (Optional) If controlling fingers individually, add finger joint angles
-    // - If you’re constraining fingers to 4 DOFs, remove or merge certain indices
 
-    // -------------------------------------
-    // 5. OnActionReceived(ActionBuffers actions)
-    // -------------------------------------
-    // - Receives the continuous actions from the policy each step
-    //   1. Parse the float actions and apply them to the incremental “changes” array/lists
-    //   2. Sum changes into new drive targets (clamp to joint limits)
-    //   3. Set the drive targets via nico.SetDriveTargets()
-    // - Reward logic:
-    //   1. Compare old vs. new distances to target (incremental reward)
-    //   2. Add or subtract reward for movement cost, orientation, or other criteria
-    //   3. Possibly end episode if the agent is “close enough” to the target
-    // - Update tracking variables, e.g., last_dist.
+    public override void Initialize()
+    {
+        NICO = GetComponent<ArticulationBody>();
+        shoulder = NICO.transform.Find("r_shoulder").GetComponent<ArticulationBody>();
 
-    // -------------------------------------
-    // 6. Heuristic(in ActionBuffers actionsOut)
-    // -------------------------------------
-    // - (Optional) For manual testing / debugging
-    // - Maps user inputs to the actions array so you can see if joints move as expected in the Editor
+        if (shoulder == null)
+        {
+            Debug.LogError("Shoulder ArticulationBody is not assigned!");
+            return;
+        }
+        
+        if (shoulder.jointType != ArticulationJointType.RevoluteJoint)
+        {   
+            Debug.Log($"- Shoulder join type: {shoulder.jointType}");
+            Debug.LogError("Shoulder joint type should be Revolute!");
+            
+            return;
+        }
 
-    // -------------------------------------
-    // 7. Utility Functions (optional)
-    // -------------------------------------
-    // - e.g., private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
-    // - e.g., private void SetJointTargets(List<float> newTargets)
-    // - e.g., private void ApplyFingerConstraints(...) for 4-DOF hand
+        lowerLimit = -90f;//shoulder.xDrive.lowerLimit;
+        upperLimit = 90f;//shoulder.xDrive.upperLimit;
+        defaultTargetPosition = target.transform.position;
+
+        initial_target_angle = shoulder.xDrive.target * Mathf.Deg2Rad;
+        target_angle = initial_target_angle;
+        change = 0f;
+
+        // Get the initial distance between the fingertip and the target
+        prevDistance = (indexFingertip.transform.position - target.transform.position).magnitude;
+        // Debug logs
+        var drive = shoulder.xDrive;
+        Debug.Log($"Initialized with:");
+        Debug.Log($"- Joint Position: {shoulder.jointPosition} degrees");
+        Debug.Log($"- Joint Limits: {lowerLimit} to {upperLimit} degrees");
+        Debug.Log($"- Drive Settings:");
+        Debug.Log($"  - Stiffness: {drive.stiffness}");
+        Debug.Log($"  - Damping: {drive.damping}");
+        Debug.Log($"  - Force Limit: {drive.forceLimit}");
+        Debug.Log($"  - Target: {drive.target} degrees");
+    }
+
+    public override void OnEpisodeBegin()
+    {
+        //target.transform.position = new Vector3(Random.Range(-4f, 4f), Random.Range(0f, 4f), Random.Range(-4f, 4f));
+        //target.transform.position = defaultTargetPosition;
+        //stepCounter = 0;
+        //target.transform.position = new Vector3(Random.Range(0.2f, 1.25f), Random.Range(1.35f, 1.8f), Random.Range(-0.2f, 0.5f));
+        target.transform.position = defaultTargetPosition + new Vector3(
+        Random.Range(-0.1f, 1.25f), 
+        Random.Range(0.0f, 0.05f), 
+        Random.Range(-0.2f, 0.2f)
+    );
+        target.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+
+        // Reset the shoulder joint to its initial position
+        var drive = shoulder.xDrive;
+        drive.target = initial_target_angle;
+        shoulder.xDrive = drive;
+
+        change = 0f;
+        target_angle = initial_target_angle;
+
+
+        // Reset the distance between the fingertip and the target
+        prevDistance = (indexFingertip.transform.position - target.transform.position).magnitude;
+    }
+
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        // Add the current shoulder joint target
+        sensor.AddObservation(shoulder.xDrive.target);
+        // Add the vector from the index fingertip to the target
+        sensor.AddObservation(target.transform.position - indexFingertip.transform.position);
+    }
+
+
+    public override void OnActionReceived(ActionBuffers actions)
+    {
+        float max_range = Mathf.Deg2Rad * 0.1f;
+        float change_magnitude = Mathf.Deg2Rad * 0.05f;
+
+        // Get the action values
+        float action = actions.ContinuousActions[0];
+        Debug.Log($"Action Received: {action}");
+
+        change = Mathf.Clamp(change + action * change_magnitude, -max_range, max_range);
+        //Debug.Log($"Change: {change}");
+        //Debug.Log($"Lower Limit: {lowerLimit} degrees");
+        //Debug.Log($"Upper Limit: {upperLimit} degrees");
+        target_angle = Mathf.Clamp(target_angle + change, 
+                              Mathf.Deg2Rad * lowerLimit, 
+                              Mathf.Deg2Rad * upperLimit);
+        var drive = shoulder.xDrive;
+        drive.target = target_angle * Mathf.Rad2Deg;
+        shoulder.xDrive = drive;
+
+        //Debug.Log($"Target Angle: {drive.target} degrees");
+        //Debug.Log($"Current Joint Position: {shoulder.jointPosition[0]} degrees");
+
+        // Calculate the new distance between the fingertip and the target
+        float distance = (indexFingertip.transform.position - target.transform.position).magnitude;
+        Debug.Log($"Distance: {distance}");
+
+        float reward = -distance;
+        setReward(reward);
+
+        if (distance <= 0.05f)
+        {
+            AddReward(1.0f); 
+            EndEpisode();
+        }
+        
+        //stepCounter++;
+        //if (stepCounter >= maxStepsPerEpisode)
+        //{
+        //    EndEpisode();
+        //}
+
+    }
+
+
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        var continuousActions = actionsOut.ContinuousActions;
+        float horizontalInput = Input.GetAxis("Horizontal");
+        Debug.Log($"Horizontal Input: {horizontalInput}");
+        continuousActions[0] = horizontalInput;
+    }
+        
 }
-
