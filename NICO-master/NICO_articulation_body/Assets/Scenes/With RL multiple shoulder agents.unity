@@ -2321,7 +2321,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 139080416}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
+  m_Script: {fileID: 11500000, guid: b414d7d1d8e0cb74a84c345239375206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -2329,7 +2329,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   NICO: {fileID: 139080421}
-  maxStepsPerEpisode: 10000
   target: {fileID: 1075856843}
   indexFingertip: {fileID: 202728031}
 --- !u!114 &139080420
@@ -6166,7 +6165,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 343819869}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
+  m_Script: {fileID: 11500000, guid: b414d7d1d8e0cb74a84c345239375206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -6174,7 +6173,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   NICO: {fileID: 343819874}
-  maxStepsPerEpisode: 10000
   target: {fileID: 1939974234}
   indexFingertip: {fileID: 983940354}
 --- !u!114 &343819873
@@ -10429,7 +10427,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 578816433}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
+  m_Script: {fileID: 11500000, guid: b414d7d1d8e0cb74a84c345239375206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -10437,7 +10435,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   NICO: {fileID: 578816438}
-  maxStepsPerEpisode: 10000
   target: {fileID: 321767407}
   indexFingertip: {fileID: 1574887796}
 --- !u!114 &578816437
@@ -11965,7 +11962,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 687446027}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
+  m_Script: {fileID: 11500000, guid: b414d7d1d8e0cb74a84c345239375206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -11973,7 +11970,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   NICO: {fileID: 687446032}
-  maxStepsPerEpisode: 10000
   target: {fileID: 863973314}
   indexFingertip: {fileID: 589446736}
 --- !u!114 &687446031
@@ -22466,7 +22462,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1337800109}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
+  m_Script: {fileID: 11500000, guid: b414d7d1d8e0cb74a84c345239375206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -22474,7 +22470,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   NICO: {fileID: 1337800114}
-  maxStepsPerEpisode: 10000
   target: {fileID: 1981078569}
   indexFingertip: {fileID: 454881267}
 --- !u!114 &1337800113
@@ -37212,7 +37207,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2312495711605055567}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb72c20c9d294a0459a87cea01aa59ea, type: 3}
+  m_Script: {fileID: 11500000, guid: b414d7d1d8e0cb74a84c345239375206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -37220,7 +37215,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   NICO: {fileID: 4257976326658113948}
-  maxStepsPerEpisode: 10000
   target: {fileID: 1276655842489041850}
   indexFingertip: {fileID: 5134498394221943540}
 --- !u!23 &4306621707624661894
