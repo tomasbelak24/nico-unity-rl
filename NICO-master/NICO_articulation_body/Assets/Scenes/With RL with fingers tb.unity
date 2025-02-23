@@ -2970,9 +2970,8 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
+  MaxStep: 5000
   NICO: {fileID: 4257976326658113948}
-  maxStepsPerEpisode: 5000
   target: {fileID: 1276655842489041850}
   indexFingertip: {fileID: 5134498394221943540}
 --- !u!23 &4306621707624661894

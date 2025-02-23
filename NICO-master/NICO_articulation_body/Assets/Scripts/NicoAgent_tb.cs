@@ -60,15 +60,15 @@ public class ShoulderAgent : Agent
         // Get the initial distance between the fingertip and the target
         prevDistance = (indexFingertip.transform.position - target.transform.position).magnitude;
         // Debug logs
-        var drive = shoulder.xDrive;
-        Debug.Log($"Initialized with:");
-        Debug.Log($"- Joint Position: {shoulder.jointPosition} degrees");
-        Debug.Log($"- Joint Limits: {lowerLimit} to {upperLimit} degrees");
-        Debug.Log($"- Drive Settings:");
-        Debug.Log($"  - Stiffness: {drive.stiffness}");
-        Debug.Log($"  - Damping: {drive.damping}");
-        Debug.Log($"  - Force Limit: {drive.forceLimit}");
-        Debug.Log($"  - Target: {drive.target} degrees");
+        //var drive = shoulder.xDrive;
+        //Debug.Log($"Initialized with:");
+        //Debug.Log($"- Joint Position: {shoulder.jointPosition} degrees");
+        //Debug.Log($"- Joint Limits: {lowerLimit} to {upperLimit} degrees");
+        //Debug.Log($"- Drive Settings:");
+        //Debug.Log($"  - Stiffness: {drive.stiffness}");
+        //Debug.Log($"  - Damping: {drive.damping}");
+        //Debug.Log($"  - Force Limit: {drive.forceLimit}");
+        //Debug.Log($"  - Target: {drive.target} degrees");
     }
 
     public override void OnEpisodeBegin()
@@ -114,7 +114,7 @@ public class ShoulderAgent : Agent
 
         // Get the action values
         float action = actions.ContinuousActions[0];
-        Debug.Log($"Action Received: {action}");
+        //Debug.Log($"Action Received: {action}");
 
         change = Mathf.Clamp(change + action * change_magnitude, -max_range, max_range);
         //Debug.Log($"Change: {change}");
@@ -132,15 +132,14 @@ public class ShoulderAgent : Agent
 
         // Calculate the new distance between the fingertip and the target
         float distance = (indexFingertip.transform.position - target.transform.position).magnitude;
-        Debug.Log($"Distance: {distance}");
-
-        float reward = -distance;
-        setReward(reward);
-
-        if (distance <= 0.05f)
+        
+        if (distance < prevDistance)
         {
-            AddReward(1.0f); 
-            EndEpisode();
+            AddReward(1f);
+        }
+        else
+        {
+            AddReward(-1.2f);
         }
         
         //stepCounter++;
@@ -156,7 +155,7 @@ public class ShoulderAgent : Agent
     {
         var continuousActions = actionsOut.ContinuousActions;
         float horizontalInput = Input.GetAxis("Horizontal");
-        Debug.Log($"Horizontal Input: {horizontalInput}");
+        //Debug.Log($"Horizontal Input: {horizontalInput}");
         continuousActions[0] = horizontalInput;
     }
         
