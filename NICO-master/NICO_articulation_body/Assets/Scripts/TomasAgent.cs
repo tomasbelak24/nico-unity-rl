@@ -66,6 +66,7 @@ public class TomasAgent : Agent
         nico = GetComponent<ArticulationBody>();
         nico.GetDofStartIndices(dof_ind);
         abs = nico.GetDriveTargets(initial_targets);
+        dofs = abs;
         nico.GetJointPositions(initial_positions);
         nico.GetJointVelocities(initial_velocities);
 
@@ -73,6 +74,8 @@ public class TomasAgent : Agent
         high_limits = new List<float>(new float[abs]);
 
         GetLimits(nico, low_limits, high_limits);
+        //Debug.Log("Low limits: " + string.Join(", ", low_limits));
+        //Debug.Log("High limits: " + string.Join(", ", high_limits));
 
         defaultTargetPosition = target.transform.position;
 
@@ -86,14 +89,15 @@ public class TomasAgent : Agent
 
 
         last_dist = (target.transform.position - effector.transform.position).magnitude;
-
+        //Debug.Log("Initialized");
     
     }
     
     
     
     public override void OnEpisodeBegin()
-    {
+    {   
+        //Debug.Log("Episode begin");
         target.transform.position = defaultTargetPosition + new Vector3(Random.Range(-0.1f, 0.95f), Random.Range(0.0f, 0.45f), Random.Range(-0.6f, 0.1f));
         
         target.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
@@ -127,8 +131,13 @@ public class TomasAgent : Agent
             changes[i] = Mathf.Clamp(changes[i] + actions.ContinuousActions[i] * change_magnitude, -max_range, max_range);
         }
 
+        //Debug.Log($"abs: {abs}");
+        //Debug.Log($"changes: {string.Join(", ", changes)}");
+        //Debug.Log($"dofs: {dofs}");
+        //Debug.Log($"targets: {string.Join(", ", targets)}");
         for (int i = 0; i < abs; ++i)
-        {
+        {       
+                //Debug.Log($"i: {i}");
                 targets[i] = Mathf.Clamp(targets[i] + changes[i], Mathf.Deg2Rad * low_limits[i], Mathf.Deg2Rad * high_limits[i]);
         }
 
@@ -167,6 +176,7 @@ public class TomasAgent : Agent
         // add all reward components together and provide reward to agent
 
         AddReward(got_closer_reward + proximity_reward + movement_reward);
+        //Debug.Log($"Reward: {got_closer_reward + proximity_reward + movement_reward}");
     }
 
 
