@@ -37,11 +37,11 @@ public class ControlJoints : MonoBehaviour
     [Range(-89f, 89f)]
     public float collarbone = 0f;
     [Range(-99f, 99f)]
-    public float upperarm = 0f;
+    public float upperarm = 65f;
     [Range(0f, 149f)]
-    public float lowerarm = 0f;
+    public float lowerarm = 20f;
     [Range(-89f, 149f)]
-    public float forearm = 0f;
+    public float forearm = 100f;
     [Range(-59f, 59f)]
     public float palm = 0f;
     [Range(-49f, 69f)]

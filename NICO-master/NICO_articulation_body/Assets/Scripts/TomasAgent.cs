@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using System.Threading;
 
 public class TomasAgent : Agent
 {
@@ -24,6 +25,16 @@ public class TomasAgent : Agent
 
     private int dofs; // pocet dof
     private int abs; // pocet articulation bodies
+
+    private Dictionary<string, float> desiredAngles = new Dictionary<string, float>
+    {
+        {"r_shoulder",   0f},
+        {"r_collarbone", 0f},
+        {"r_upper_arm",   -65f},
+        {"r_lower_arm",   20f},
+        {"r_forearm",    100f},
+        {"r_palm",       0f},
+    };
 
 
 
@@ -57,6 +68,61 @@ public class TomasAgent : Agent
     }
 
 
+    private void setNaturalPosition(ArticulationBody root, Dictionary<string, float> desiredAngles)
+{
+    if (root == null)
+    {
+        Debug.LogError("Root ArticulationBody is null.");
+        return;
+    }
+
+    foreach (var kvp in desiredAngles)
+    {
+        string targetName = kvp.Key;
+        float targetAngle = kvp.Value;
+
+        ArticulationBody targetBody = FindArticulationBodyByName(root, targetName);
+        if (targetBody != null)
+        {   
+            targetBody.SetDriveTarget(ArticulationDriveAxis.X, targetAngle);
+            //var drive = targetBody.xDrive;
+            //drive.target = targetAngle;
+            //targetBody.xDrive = drive;
+        }
+        else
+        {
+            Debug.LogWarning($"ArticulationBody '{targetName}' not found in hierarchy.");
+        }
+    }
+    Debug.Log("Set natural position");
+    //Thread.Sleep(15000);
+}
+
+    private ArticulationBody FindArticulationBodyByName(ArticulationBody root, string name)
+    {
+        if (root.name == name)
+            return root;
+
+        foreach (Transform child in root.transform)
+        {
+            ArticulationBody childBody = child.GetComponent<ArticulationBody>();
+            if (childBody != null)
+            {
+                ArticulationBody found = FindArticulationBodyByName(childBody, name);
+                if (found != null)
+                    return found;
+            }
+        }
+        return null;
+    }
+
+    /*void Start()
+    {
+        //Debug.Log("Started");
+        ArticulationBody root = GetComponent<ArticulationBody>();
+        setNaturalPosition(root, desiredAngles);
+    }*/
+
     public override void Initialize()
     {
         base.Initialize();
@@ -64,6 +130,7 @@ public class TomasAgent : Agent
         // remember initial joint positions and velocities so we can reset them at next episode start
 
         nico = GetComponent<ArticulationBody>();
+        //setNaturalPosition(nico, desiredAngles);
         nico.GetDofStartIndices(dof_ind);
         abs = nico.GetDriveTargets(initial_targets);
         dofs = abs;
@@ -77,7 +144,7 @@ public class TomasAgent : Agent
         //Debug.Log("Low limits: " + string.Join(", ", low_limits));
         //Debug.Log("High limits: " + string.Join(", ", high_limits));
 
-        defaultTargetPosition = target.transform.position;
+        defaultTargetPosition = target.transform.position; // default position of target (red cube)
 
         for (int i = 0; i < dofs; ++i)
         {
