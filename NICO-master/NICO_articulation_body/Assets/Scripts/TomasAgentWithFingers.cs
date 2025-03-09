@@ -38,6 +38,9 @@ public class TomasAgentWithFingers : Agent
     [Tooltip("End effector")]
     public GameObject effector;
 
+    [Tooltip("Head")]
+    public GameObject head;
+
     private int thumb_root;
     private List<int> thumb_parts = new List<int>();
 
@@ -260,6 +263,8 @@ public class TomasAgentWithFingers : Agent
         // get vector from end effector to target
 
         sensor.AddObservation(target.transform.position - effector.transform.position);
+        Vector3 relativeTargetPosition = target.transform.position - head.transform.position;
+        sensor.AddObservation(relativeTargetPosition.normalized); // 3d vector from head to target, normalized because magnitude is not important
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -306,12 +311,13 @@ public class TomasAgentWithFingers : Agent
                     case int k when finger_parts.Contains(k):
                         targets[i] = fingers_rot;
                         break;
-                    case int k when k == 1: //HLAVA
+                    // Ked nechceme pohybovat hlavou a krkom
+                    /*case int k when k == 1: //HLAVA
                         targets[i] = 0;
                         break;
                     case int k when k ==3: // KRK
                         targets[i] = 0;
-                        break;
+                        break; */
                     default:
                         targets[i] = Mathf.Clamp(targets[i] + changes[j], Mathf.Deg2Rad * low_limits[i], Mathf.Deg2Rad * high_limits[i]);
                         j++;
@@ -388,6 +394,17 @@ public class TomasAgentWithFingers : Agent
         // Total reward
         AddReward(pointing_reward);
         //Debug.Log("Pointing reward: " + pointing_reward);
+
+        // rewarding nico for looking at the target
+        Vector3 headForward = head.transform.right; // head forward vector
+        Debug.Log("Head forward vector: " + headForward);
+        Vector3 relativeTargetPosition = (target.transform.position - head.transform.position).normalized;
+
+        float dotProduct = Vector3.Dot(headForward, relativeTargetPosition);
+        float alignmentReward = (dotProduct + 1) / 2; // Normalize (-1 to 1) → (0 to 1)
+
+        AddReward(alignmentReward);
+        Debug.Log("Alignment reward: " + alignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
