@@ -128,7 +128,7 @@ public class TomasAgentWithFingers : Agent
             {
                 int j = child_ab.index;
 
-                Debug.Log("Child: " + child.name + " index: " + j);
+                //Debug.Log("Child: " + child.name + " index: " + j);
                 // getting indices of individual finger parts for constrained (4 DoF) version of control
                 switch (child.tag)
                 {
@@ -182,11 +182,11 @@ public class TomasAgentWithFingers : Agent
 
         GetLimits(nico, low_limits, high_limits);
 
-        Debug.Log("dof_ind: ");
+        /*Debug.Log("dof_ind: ");
         foreach (var i in dof_ind)
         {
             Debug.Log(i);
-        }
+        }*/
 
         // if fingers are constrained, number of DoFs is different than number of art. bodies
 
@@ -273,6 +273,9 @@ public class TomasAgentWithFingers : Agent
         sensor.AddObservation(relativeTargetPosition.normalized); // 3d vector from head to target, normalized because magnitude is not important
     }
 
+
+    //TODO: upravit reward funkciu tak, aby sa pouzival akoby zrotovany vektor z hlavy smerom k targetu tym padom
+    // nebude zaporny kosinus uhlu medzi vektormi ked pojdu opacnym smerom, ale ked kocka bude vpravo a nico bude pozerat dolava
     public override void OnActionReceived(ActionBuffers actions)
     {
         float max_range = Mathf.Deg2Rad * 0.1f;
@@ -317,13 +320,11 @@ public class TomasAgentWithFingers : Agent
                     case int k when finger_parts.Contains(k):
                         targets[i] = fingers_rot;
                         break;
-                    // Ked nechceme pohybovat hlavou a krkom
-                    /*case int k when k == 1: //HLAVA
+                    case int k when k != 1 && k != 3: // ked to nie je hlava ani krk
                         targets[i] = 0;
+                        j++;
                         break;
-                    case int k when k ==3: // KRK
-                        targets[i] = 0;
-                        break; */
+                    
                     default:
                         targets[i] = Mathf.Clamp(targets[i] + changes[j], Mathf.Deg2Rad * low_limits[i], Mathf.Deg2Rad * high_limits[i]);
                         j++;
@@ -354,6 +355,7 @@ public class TomasAgentWithFingers : Agent
         {
             movement_reward += -0.5f * Mathf.Abs(changes[i]);
         }
+        AddReward(movement_reward);
 
         // give reward for moving closer to target
 
@@ -373,7 +375,7 @@ public class TomasAgentWithFingers : Agent
 
         // add all reward components together and provide reward to agent
 
-        AddReward(got_closer_reward + proximity_reward + movement_reward);
+        //AddReward(got_closer_reward + proximity_reward + movement_reward);
 
         float pointing_reward = 0f;
 
@@ -389,29 +391,27 @@ public class TomasAgentWithFingers : Agent
         float thumb_diff = Mathf.Abs(targets[thumb_root] - Mathf.Deg2Rad * low_limits[thumb_root]);
         pointing_reward += -thumb_diff * 5f;
 
-        //Debug.Log("root targets: " + targets[thumb_root] + " " + targets[index_root] + " " + targets[fingers_root]);
-        //Debug.Log("root diffs: " + thumb_diff + " " + index_diff + " " + fingers_diff);
-        
         if (index_diff < 0.05f && fingers_diff < 0.05f && thumb_diff < 0.05f)
         {
             pointing_reward += 1f;
         }
 
         // Total reward
-        AddReward(pointing_reward);
+        //AddReward(pointing_reward);
         //Debug.Log("Pointing reward: " + pointing_reward);
 
         // rewarding nico for looking at the target
-        Vector3 headForward = eye_position.transform.right; // head forward vector
-        Debug.Log("Head forward vector: " + headForward);
+        Vector3 headForward = eye_position.transform.rotation * Vector3.right;; // head forward vector
+        //Debug.Log("Head forward vector: " + headForward);
         Vector3 relativeTargetPosition = (target.transform.position - eye_position.transform.position).normalized;
-        Debug.Log("Relative target position: " + relativeTargetPosition);
+        //Debug.Log("Relative target position: " + relativeTargetPosition);
 
         float dotProduct = Vector3.Dot(headForward, relativeTargetPosition);
+        
         float alignmentReward = (dotProduct + 1) / 2; // Normalize (-1 to 1) → (0 to 1)
 
         AddReward(alignmentReward);
-        Debug.Log("Alignment reward: " + alignmentReward);
+        //Debug.Log("Alignment reward: " + alignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
