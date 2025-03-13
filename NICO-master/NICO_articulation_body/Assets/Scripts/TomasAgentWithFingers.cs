@@ -182,6 +182,12 @@ public class TomasAgentWithFingers : Agent
 
         GetLimits(nico, low_limits, high_limits);
 
+        Debug.Log("dof_ind: ");
+        foreach (var i in dof_ind)
+        {
+            Debug.Log(i);
+        }
+
         // if fingers are constrained, number of DoFs is different than number of art. bodies
 
         if (constrain_fingers)
@@ -410,9 +416,9 @@ public class TomasAgentWithFingers : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var continuousActionsOut = actionsOut.ContinuousActions;
-        continuousActionsOut[0] = Input.GetAxis("Horizontal"); // palec
-        continuousActionsOut[1] = Input.GetAxis("Vertical"); // index
-        continuousActionsOut[2] = Input.GetAxis("Jump"); // ostatne prsty
+        continuousActionsOut[4] = Input.GetAxis("Horizontal"); // palec
+        continuousActionsOut[6] = Input.GetAxis("Vertical"); // index
+        continuousActionsOut[7] = Input.GetAxis("Jump"); // ostatne prsty
     }
 
 }

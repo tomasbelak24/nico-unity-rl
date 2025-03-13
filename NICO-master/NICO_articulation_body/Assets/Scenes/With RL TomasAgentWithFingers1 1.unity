@@ -2938,7 +2938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 15
+    VectorObservationSize: 18
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 12
@@ -2974,6 +2974,7 @@ MonoBehaviour:
   constrain_fingers: 1
   target: {fileID: 1276655842489041850}
   effector: {fileID: 5134498394221943540}
+  head: {fileID: 5263491986790790727}
 --- !u!23 &4306621707624661894
 MeshRenderer:
   m_ObjectHideFlags: 0
