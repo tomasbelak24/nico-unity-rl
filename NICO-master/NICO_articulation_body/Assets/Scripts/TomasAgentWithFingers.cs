@@ -38,8 +38,8 @@ public class TomasAgentWithFingers : Agent
     [Tooltip("End effector")]
     public GameObject effector;
 
-    [Tooltip("Head")]
-    public GameObject head;
+    [Tooltip("Eye position")]
+    public GameObject eye_position;
 
     private int thumb_root;
     private List<int> thumb_parts = new List<int>();
@@ -269,7 +269,7 @@ public class TomasAgentWithFingers : Agent
         // get vector from end effector to target
 
         sensor.AddObservation(target.transform.position - effector.transform.position);
-        Vector3 relativeTargetPosition = target.transform.position - head.transform.position;
+        Vector3 relativeTargetPosition = target.transform.position - eye_position.transform.position;
         sensor.AddObservation(relativeTargetPosition.normalized); // 3d vector from head to target, normalized because magnitude is not important
     }
 
@@ -402,9 +402,10 @@ public class TomasAgentWithFingers : Agent
         //Debug.Log("Pointing reward: " + pointing_reward);
 
         // rewarding nico for looking at the target
-        Vector3 headForward = head.transform.right; // head forward vector
+        Vector3 headForward = eye_position.transform.right; // head forward vector
         Debug.Log("Head forward vector: " + headForward);
-        Vector3 relativeTargetPosition = (target.transform.position - head.transform.position).normalized;
+        Vector3 relativeTargetPosition = (target.transform.position - eye_position.transform.position).normalized;
+        Debug.Log("Relative target position: " + relativeTargetPosition);
 
         float dotProduct = Vector3.Dot(headForward, relativeTargetPosition);
         float alignmentReward = (dotProduct + 1) / 2; // Normalize (-1 to 1) → (0 to 1)
@@ -416,9 +417,9 @@ public class TomasAgentWithFingers : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var continuousActionsOut = actionsOut.ContinuousActions;
-        continuousActionsOut[4] = Input.GetAxis("Horizontal"); // palec
-        continuousActionsOut[6] = Input.GetAxis("Vertical"); // index
-        continuousActionsOut[7] = Input.GetAxis("Jump"); // ostatne prsty
+        continuousActionsOut[4] = Input.GetAxis("Horizontal"); // krk
+        continuousActionsOut[6] = Input.GetAxis("Vertical"); // hlava
+        //continuousActionsOut[7] = Input.GetAxis("Jump"); // 
     }
 
 }
