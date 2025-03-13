@@ -402,16 +402,16 @@ public class TomasAgentWithFingers : Agent
 
         // rewarding nico for looking at the target
         Vector3 headForward = eye_position.transform.rotation * Vector3.right;; // head forward vector
-        //Debug.Log("Head forward vector: " + headForward);
+        Debug.Log("Head forward vector: " + headForward);
         Vector3 relativeTargetPosition = (target.transform.position - eye_position.transform.position).normalized;
-        //Debug.Log("Relative target position: " + relativeTargetPosition);
+        Debug.Log("Relative target position: " + relativeTargetPosition);
 
         float dotProduct = Vector3.Dot(headForward, relativeTargetPosition);
         
         float alignmentReward = (dotProduct + 1) / 2; // Normalize (-1 to 1) → (0 to 1)
 
         AddReward(alignmentReward);
-        //Debug.Log("Alignment reward: " + alignmentReward);
+        Debug.Log("Alignment reward: " + alignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
