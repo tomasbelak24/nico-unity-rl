@@ -34,6 +34,7 @@ public class TomasAgentWithFingers : Agent
 
     [Tooltip("The target object")]
     public GameObject target;
+    Vector3 defaultTargetPosition;
 
     [Tooltip("End effector")]
     public GameObject effector;
@@ -216,6 +217,7 @@ public class TomasAgentWithFingers : Agent
 
         // get distance from target to end effector
 
+        defaultTargetPosition = target.transform.position;
         last_dist = (target.transform.position - effector.transform.position).magnitude;
     }
 
@@ -223,7 +225,11 @@ public class TomasAgentWithFingers : Agent
     {
         // move target cube to a random position
 
-        target.transform.position = new Vector3(Random.Range(0.2f, 1.25f), Random.Range(1.35f, 1.8f), Random.Range(-0.2f, 0.5f));
+        target.transform.position = defaultTargetPosition + new Vector3(
+        Random.Range(-0.1f, 1.25f), 
+        Random.Range(0.0f, 0.05f), 
+        Random.Range(-0.2f, 0.2f)
+    );
         target.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
 
         // reset joint positions, velocities, targets
@@ -401,17 +407,23 @@ public class TomasAgentWithFingers : Agent
         //Debug.Log("Pointing reward: " + pointing_reward);
 
         // rewarding nico for looking at the target
-        Vector3 headForward = eye_position.transform.rotation * Vector3.right;; // head forward vector
-        Debug.Log("Head forward vector: " + headForward);
-        Vector3 relativeTargetPosition = (target.transform.position - eye_position.transform.position).normalized;
-        Debug.Log("Relative target position: " + relativeTargetPosition);
-
-        float dotProduct = Vector3.Dot(headForward, relativeTargetPosition);
         
-        float alignmentReward = (dotProduct + 1) / 2; // Normalize (-1 to 1) → (0 to 1)
+        // Get world-space direction from head to cube
+        Vector3 directionToCube = (target.transform.position - eye_position.transform.position).normalized;
+        Debug.DrawRay(eye_position.transform.position, directionToCube, Color.red);
+        
+        // Get world-space right vector of the head
+        Vector3 worldRightVector = eye_position.transform.rotation * Vector3.right;
+        Debug.DrawRay(eye_position.transform.position, worldRightVector, Color.green);
 
+        // Compute the angle in degrees
+        float cosAngle = Vector3.Dot(worldRightVector, directionToCube);
+
+        float alignmentReward = (cosAngle+1) /2; // Reward is in range [0, 1]
+
+        // Add to reward
         AddReward(alignmentReward);
-        Debug.Log("Alignment reward: " + alignmentReward);
+        //Debug.Log("Alignment reward: " + alignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
