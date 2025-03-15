@@ -34,6 +34,7 @@ public class TomasAgentWithFingers : Agent
 
     [Tooltip("The target object")]
     public GameObject target;
+    Vector3 defaultTargetPosition;
 
     [Tooltip("End effector")]
     public GameObject effector;
@@ -51,69 +52,6 @@ public class TomasAgentWithFingers : Agent
     private List<int> finger_parts = new List<int>();
 
     private float last_dist;
-    
-    private bool pointing = true;
-
-    public void togglePointing(){
-        // toggle between pointing and not pointing
-        float thumb_rot = 0f;
-        float index_rot = 0f;
-        float fingers_rot = 0f;
-
-
-        if (constrain_fingers)
-        {
-            // first three actions control finger roots, others are mapped to the rest of body
-            if(pointing){
-                thumb_rot = Mathf.Deg2Rad * -50f;
-                index_rot = Mathf.Deg2Rad * 0;
-                fingers_rot = Mathf.Deg2Rad * 60;
-            } else {
-                thumb_rot = Mathf.Deg2Rad * 70 - 0.1f;
-                index_rot = Mathf.Deg2Rad * 0;
-                fingers_rot = Mathf.Deg2Rad * 0;
-            }
-            
-
-            int j = 3;
-            for (int i = 0; i < abs; ++i)
-            {
-                switch (i)
-                {
-                    case int k when k == thumb_root:
-                        initial_targets[i] = thumb_rot;
-                        break;
-                    case int k when k == index_root:
-                        initial_targets[i] = index_rot;
-                        break;
-                    case int k when k == fingers_root:
-                        initial_targets[i] = fingers_rot;
-                        break;
-                    case int k when thumb_parts.Contains(k):
-                        initial_targets[i] = thumb_rot / 4;
-                        break;
-                    case int k when index_parts.Contains(k):
-                        initial_targets[i] = index_rot;
-                        break;
-                    case int k when finger_parts.Contains(k):
-                        initial_targets[i] = fingers_rot;
-                        break;
-                    default:
-                        initial_targets[i] = initial_targets[i];
-                        j++;
-                        break;
-                }
-            }
-            //Debug.Log("Targets: ");
-            //foreach (var i in targets){
-                //Debug.Log(i);
-            //}
-        }
-        else
-        {
-            Debug.LogError("Fingers are not constrained, cannot toggle pointing");
-        }
-    }
 
     private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
     {
@@ -128,8 +66,6 @@ public class TomasAgentWithFingers : Agent
             {
                 int j = child_ab.index;
 
-                //Debug.Log("Child: " + child.name + " index: " + j);
-                // getting indices of individual finger parts for constrained (4 DoF) version of control
                 switch (child.tag)
                 {
                     case "ThumbBase":
@@ -171,22 +107,10 @@ public class TomasAgentWithFingers : Agent
         nico.GetJointPositions(initial_positions);
         nico.GetJointVelocities(initial_velocities);
 
-        //Debug.Log("Initial targets: ");
-        //for(int i = 0; i < abs; i++){
-            //Debug.Log("Initial target " + i + ": " + initial_targets[i] * Mathf.Rad2Deg);
-        //}
-        
-
         low_limits = new List<float>(new float[abs]);
         high_limits = new List<float>(new float[abs]);
 
         GetLimits(nico, low_limits, high_limits);
-
-        /*Debug.Log("dof_ind: ");
-        foreach (var i in dof_ind)
-        {
-            Debug.Log(i);
-        }*/
 
         // if fingers are constrained, number of DoFs is different than number of art. bodies
 
@@ -207,15 +131,9 @@ public class TomasAgentWithFingers : Agent
         changes = new List<float>(initial_changes);
         targets = new List<float>(initial_targets);
 
-        //Debug.Log("Roots: " + thumb_root + " " + index_root + " " + fingers_root);
-        //Debug.Log("Parts: " + thumb_parts.Count + " " + index_parts.Count + " " + finger_parts.Count);
-
-        //togglePointing();
-        
-        //nico.SetDriveTargets(targets);
-
         // get distance from target to end effector
 
+        defaultTargetPosition = target.transform.position;
         last_dist = (target.transform.position - effector.transform.position).magnitude;
     }
 
@@ -223,7 +141,11 @@ public class TomasAgentWithFingers : Agent
     {
         // move target cube to a random position
 
-        target.transform.position = new Vector3(Random.Range(0.2f, 1.25f), Random.Range(1.35f, 1.8f), Random.Range(-0.2f, 0.5f));
+        target.transform.position = defaultTargetPosition + new Vector3(
+        Random.Range(-0.1f, 1.25f), 
+        Random.Range(0.0f, 0.05f), 
+        Random.Range(-0.2f, 0.2f)
+    );
         target.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
 
         // reset joint positions, velocities, targets
@@ -274,8 +196,6 @@ public class TomasAgentWithFingers : Agent
     }
 
 
-    //TODO: upravit reward funkciu tak, aby sa pouzival akoby zrotovany vektor z hlavy smerom k targetu tym padom
-    // nebude zaporny kosinus uhlu medzi vektormi ked pojdu opacnym smerom, ale ked kocka bude vpravo a nico bude pozerat dolava
     public override void OnActionReceived(ActionBuffers actions)
     {
         float max_range = Mathf.Deg2Rad * 0.1f;
@@ -355,7 +275,7 @@ public class TomasAgentWithFingers : Agent
         {
             movement_reward += -0.5f * Mathf.Abs(changes[i]);
         }
-        AddReward(movement_reward);
+        //AddReward(movement_reward);
 
         // give reward for moving closer to target
 
@@ -375,7 +295,7 @@ public class TomasAgentWithFingers : Agent
 
         // add all reward components together and provide reward to agent
 
-        //AddReward(got_closer_reward + proximity_reward + movement_reward);
+        AddReward(got_closer_reward + proximity_reward + movement_reward);
 
         float pointing_reward = 0f;
 
@@ -397,21 +317,25 @@ public class TomasAgentWithFingers : Agent
         }
 
         // Total reward
-        //AddReward(pointing_reward);
+        AddReward(pointing_reward);
         //Debug.Log("Pointing reward: " + pointing_reward);
 
         // rewarding nico for looking at the target
-        Vector3 headForward = eye_position.transform.rotation * Vector3.right;; // head forward vector
-        Debug.Log("Head forward vector: " + headForward);
-        Vector3 relativeTargetPosition = (target.transform.position - eye_position.transform.position).normalized;
-        Debug.Log("Relative target position: " + relativeTargetPosition);
-
-        float dotProduct = Vector3.Dot(headForward, relativeTargetPosition);
         
-        float alignmentReward = (dotProduct + 1) / 2; // Normalize (-1 to 1) → (0 to 1)
+        // Get world-space direction from head to cube
+        Vector3 directionToCube = (target.transform.position - eye_position.transform.position).normalized;
+        Debug.DrawRay(eye_position.transform.position, directionToCube, Color.red);
+        
+        // Get world-space right vector of the head
+        Vector3 worldRightVector = eye_position.transform.rotation * Vector3.right;
+        Debug.DrawRay(eye_position.transform.position, worldRightVector, Color.green);
 
+        // Compute the angle in degrees
+        float cosAngle = Vector3.Dot(worldRightVector, directionToCube);
+
+        float alignmentReward = (cosAngle+1) /2; // Reward is in range [0, 1]
         AddReward(alignmentReward);
-        Debug.Log("Alignment reward: " + alignmentReward);
+        //Debug.Log("Alignment reward: " + alignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
