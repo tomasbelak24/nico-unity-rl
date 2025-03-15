@@ -240,11 +240,13 @@ public class TomasAgentWithFingers : Agent
                     case int k when finger_parts.Contains(k):
                         targets[i] = fingers_rot;
                         break;
-                    case int k when k != 1 && k != 3: // ked to nie je hlava ani krk
+                    
+                    /*case int k when k != 1 && k != 3: // ked to nie je hlava ani krk
                         targets[i] = 0;
                         j++;
                         break;
-                    
+                    */
+
                     default:
                         targets[i] = Mathf.Clamp(targets[i] + changes[j], Mathf.Deg2Rad * low_limits[i], Mathf.Deg2Rad * high_limits[i]);
                         j++;
