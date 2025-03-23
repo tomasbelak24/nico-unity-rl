@@ -240,11 +240,19 @@ public class TomasAgentWithFingers : Agent
                     case int k when finger_parts.Contains(k):
                         targets[i] = fingers_rot;
                         break;
+<<<<<<< Updated upstream
+=======
+                    
+>>>>>>> Stashed changes
                     case int k when k != 1 && k != 3: // ked to nie je hlava ani krk
                         targets[i] = 0;
                         j++;
                         break;
+<<<<<<< Updated upstream
                     
+=======
+
+>>>>>>> Stashed changes
                     default:
                         targets[i] = Mathf.Clamp(targets[i] + changes[j], Mathf.Deg2Rad * low_limits[i], Mathf.Deg2Rad * high_limits[i]);
                         j++;
@@ -295,7 +303,7 @@ public class TomasAgentWithFingers : Agent
 
         // add all reward components together and provide reward to agent
 
-        AddReward(got_closer_reward + proximity_reward + movement_reward);
+        //AddReward(got_closer_reward + proximity_reward + movement_reward);
 
         float pointing_reward = 0f;
 
@@ -317,7 +325,7 @@ public class TomasAgentWithFingers : Agent
         }
 
         // Total reward
-        AddReward(pointing_reward);
+        //AddReward(pointing_reward);
         //Debug.Log("Pointing reward: " + pointing_reward);
 
         // rewarding nico for looking at the target
@@ -342,7 +350,7 @@ public class TomasAgentWithFingers : Agent
     {
         var continuousActionsOut = actionsOut.ContinuousActions;
         continuousActionsOut[4] = Input.GetAxis("Horizontal"); // krk
-        continuousActionsOut[6] = Input.GetAxis("Vertical"); // hlava
+        continuousActionsOut[6] = -Input.GetAxis("Vertical"); // hlava
         //continuousActionsOut[7] = Input.GetAxis("Jump"); // 
     }
 
