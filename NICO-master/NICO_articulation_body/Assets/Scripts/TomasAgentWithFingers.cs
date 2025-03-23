@@ -42,6 +42,11 @@ public class TomasAgentWithFingers : Agent
     [Tooltip("Eye position")]
     public GameObject eye_position;
 
+    [Tooltip("alpha coefficient used for alignment reward calculation")]
+    public float alignment_alpha = 0.6f;
+    private float last_alignment_reward = -100f;
+    //private bool is_set_last_alignment_reward = false;
+
     private int thumb_root;
     private List<int> thumb_parts = new List<int>();
 
@@ -52,6 +57,7 @@ public class TomasAgentWithFingers : Agent
     private List<int> finger_parts = new List<int>();
 
     private float last_dist;
+    
 
     private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
     {
@@ -240,19 +246,11 @@ public class TomasAgentWithFingers : Agent
                     case int k when finger_parts.Contains(k):
                         targets[i] = fingers_rot;
                         break;
-<<<<<<< Updated upstream
-=======
-                    
->>>>>>> Stashed changes
                     case int k when k != 1 && k != 3: // ked to nie je hlava ani krk
                         targets[i] = 0;
                         j++;
                         break;
-<<<<<<< Updated upstream
                     
-=======
-
->>>>>>> Stashed changes
                     default:
                         targets[i] = Mathf.Clamp(targets[i] + changes[j], Mathf.Deg2Rad * low_limits[i], Mathf.Deg2Rad * high_limits[i]);
                         j++;
@@ -342,8 +340,21 @@ public class TomasAgentWithFingers : Agent
         float cosAngle = Vector3.Dot(worldRightVector, directionToCube);
 
         float alignmentReward = (cosAngle+1) /2; // Reward is in range [0, 1]
-        AddReward(alignmentReward);
-        //Debug.Log("Alignment reward: " + alignmentReward);
+        float newAlignmentReward = 0f;
+
+        if (last_alignment_reward == -100f)
+        {
+            last_alignment_reward = alignmentReward;
+            //is_set_last_alignment_reward = true;
+            newAlignmentReward = alignmentReward;
+        } else
+        {
+            alignmentReward = (alignment_alpha * alignmentReward) - ((1f - alignment_alpha) * last_alignment_reward);
+            newAlignmentReward = alignmentReward - last_alignment_reward;
+            last_alignment_reward = alignmentReward;
+        }
+        AddReward(newAlignmentReward);
+        //Debug.Log("Alignment reward: " + newAlignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)

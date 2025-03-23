@@ -3113,9 +3113,9 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: c1fb4a8149888af4d919fe7f12a52d95, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 0
   m_BehaviorName: NICO
   TeamId: 0
   m_UseChildSensors: 1
@@ -3141,6 +3141,7 @@ MonoBehaviour:
   target: {fileID: 1276655842489041850}
   effector: {fileID: 5134498394221943540}
   eye_position: {fileID: 1776329356}
+  alignment_alpha: 0.4
 --- !u!23 &4306621707624661894
 MeshRenderer:
   m_ObjectHideFlags: 0
