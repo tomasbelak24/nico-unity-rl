@@ -205,7 +205,11 @@ public class TomasAgentWithFingers : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         float max_range = Mathf.Deg2Rad * 0.1f;
-        float change_magnitude = Mathf.Deg2Rad * 0.05f;
+        float base_change_magnitude = Mathf.Deg2Rad * 0.05f;
+
+        float strength = Mathf.Max(0f, actions.ContinuousActions[dofs]); // Applied ReLU activation function to the last action
+        float change_magnitude = base_change_magnitude * strength; // scale the change magnitude according to the last action
+        Debug.Log($"Strength factor: {strength}, Change magnitude: {change_magnitude}");
 
         // modify incremental changes according to policy outputs
 
@@ -341,8 +345,9 @@ public class TomasAgentWithFingers : Agent
 
         float alignmentReward = (cosAngle+1) /2; // Reward is in range [0, 1]
         float newAlignmentReward = 0f;
+        newAlignmentReward = alignmentReward;
 
-        if (last_alignment_reward == -100f)
+        /*if (last_alignment_reward == -100f)
         {
             last_alignment_reward = alignmentReward;
             //is_set_last_alignment_reward = true;
@@ -353,8 +358,9 @@ public class TomasAgentWithFingers : Agent
             newAlignmentReward = alignmentReward - last_alignment_reward;
             last_alignment_reward = alignmentReward;
         }
+        */
         AddReward(newAlignmentReward);
-        //Debug.Log("Alignment reward: " + newAlignmentReward);
+        Debug.Log("Alignment reward: " + newAlignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -362,6 +368,7 @@ public class TomasAgentWithFingers : Agent
         var continuousActionsOut = actionsOut.ContinuousActions;
         continuousActionsOut[4] = Input.GetAxis("Horizontal"); // krk
         continuousActionsOut[6] = -Input.GetAxis("Vertical"); // hlava
+        continuousActionsOut[dofs] = 1.0f; // strength of the action
         //continuousActionsOut[7] = Input.GetAxis("Jump"); // 
     }
 
