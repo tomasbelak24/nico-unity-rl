@@ -9,6 +9,14 @@ using Random = UnityEngine.Random;
 using Grpc.Core;
 using System.Runtime.CompilerServices;
 
+public enum ActivationFunction
+{
+    ReLU,
+    WeirdReLU_k2_c4,
+    Sigmoid,
+    Linear
+}
+
 public class TomasAgentWithFingers : Agent
 {
     // initialize used variables
@@ -57,7 +65,31 @@ public class TomasAgentWithFingers : Agent
     private List<int> finger_parts = new List<int>();
 
     private float last_dist;
-    
+
+    [Tooltip("Activation function used to determine the strength of the joint updates")]    
+    public ActivationFunction activationFunction = ActivationFunction.ReLU;
+
+    float ApplyActivationFunction(float input)
+    {
+        switch (activationFunction)
+        {
+            case ActivationFunction.ReLU:
+                return Mathf.Max(0f, input); // ReLU
+            case ActivationFunction.Sigmoid:
+                return 1f / (1f + Mathf.Exp(-input)); // Sigmoid
+            case ActivationFunction.WeirdReLU_k2_c4:
+                //f(x) = k * tanh(ReLU(x / c)^2)
+                float c = 4f;
+                float k = 2f;
+                float relu = Mathf.Max(0f, input / c);
+                return k * (float)System.Math.Tanh(relu * relu);
+            case ActivationFunction.Linear:
+                return input; // Linear
+            default:
+                return input; // default to linear
+        }
+    }
+
 
     private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
     {
@@ -207,9 +239,9 @@ public class TomasAgentWithFingers : Agent
         float max_range = Mathf.Deg2Rad * 0.1f;
         float base_change_magnitude = Mathf.Deg2Rad * 0.05f;
 
-        float strength = Mathf.Max(0f, actions.ContinuousActions[dofs]); // Applied ReLU activation function to the last action
+        float strength = ApplyActivationFunction(actions.ContinuousActions[dofs]); // Applied activation function to the last output of NN
         float change_magnitude = base_change_magnitude * strength; // scale the change magnitude according to the last action
-        Debug.Log($"Strength factor: {strength}, Change magnitude: {change_magnitude}");
+        //Debug.Log($"Strength factor: {strength}, Change magnitude: {change_magnitude}");
 
         // modify incremental changes according to policy outputs
 
@@ -232,7 +264,7 @@ public class TomasAgentWithFingers : Agent
             {
                 switch (i)
                 {
-                    case int k when k == thumb_root:
+                    /*case int k when k == thumb_root:
                         targets[i] = thumb_rot;
                         break;
                     case int k when k == index_root:
@@ -250,8 +282,9 @@ public class TomasAgentWithFingers : Agent
                     case int k when finger_parts.Contains(k):
                         targets[i] = fingers_rot;
                         break;
+                    */
                     case int k when k != 1 && k != 3: // ked to nie je hlava ani krk
-                        targets[i] = 0;
+                        targets[i] = 0f;
                         j++;
                         break;
                     
@@ -285,7 +318,7 @@ public class TomasAgentWithFingers : Agent
         {
             movement_reward += -0.5f * Mathf.Abs(changes[i]);
         }
-        //AddReward(movement_reward);
+        AddReward(movement_reward);
 
         // give reward for moving closer to target
 
@@ -360,7 +393,7 @@ public class TomasAgentWithFingers : Agent
         }
         */
         AddReward(newAlignmentReward);
-        Debug.Log("Alignment reward: " + newAlignmentReward);
+        //Debug.Log("Alignment reward: " + newAlignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -372,5 +405,5 @@ public class TomasAgentWithFingers : Agent
         //continuousActionsOut[7] = Input.GetAxis("Jump"); // 
     }
 
-}
 
+}
