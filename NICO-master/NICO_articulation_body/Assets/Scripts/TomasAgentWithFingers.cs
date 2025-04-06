@@ -65,6 +65,7 @@ public class TomasAgentWithFingers : Agent
     private List<int> finger_parts = new List<int>();
 
     private float last_dist;
+    private float last_alignment;
 
     [Tooltip("Activation function used to determine the strength of the joint updates")]    
     public ActivationFunction activationFunction = ActivationFunction.ReLU;
@@ -173,6 +174,7 @@ public class TomasAgentWithFingers : Agent
 
         defaultTargetPosition = target.transform.position;
         last_dist = (target.transform.position - effector.transform.position).magnitude;
+        last_alignment = 0f;
     }
 
     public override void OnEpisodeBegin()
@@ -194,6 +196,12 @@ public class TomasAgentWithFingers : Agent
 
         changes = new List<float>(initial_changes);
         targets = new List<float>(initial_targets);
+
+        last_dist = (target.transform.position - effector.transform.position).magnitude;
+        Vector3 directionToCube = (target.transform.position - eye_position.transform.position).normalized;
+        Vector3 worldRightVector = eye_position.transform.rotation * Vector3.right;
+        float cosAngle = Vector3.Dot(worldRightVector, directionToCube);
+        last_alignment = (cosAngle+1) /2;
 
     }
 
@@ -376,9 +384,18 @@ public class TomasAgentWithFingers : Agent
         // Compute the angle in degrees
         float cosAngle = Vector3.Dot(worldRightVector, directionToCube);
 
-        float alignmentReward = (cosAngle+1) /2; // Reward is in range [0, 1]
-        float newAlignmentReward = 0f;
-        newAlignmentReward = alignmentReward;
+        float new_alignment = (cosAngle+1f) / 2f; // Reward is in range [0, 1]
+        //Debug.Log("alignment: " + new_alignment);
+        float alignmentReward = -3f;
+        
+        if (new_alignment - last_alignment > 0f)
+        {
+            alignmentReward = 1f;
+        }
+
+        last_alignment = new_alignment;
+        
+        //newAlignmentReward = alignmentReward;
 
         /*if (last_alignment_reward == -100f)
         {
@@ -392,8 +409,8 @@ public class TomasAgentWithFingers : Agent
             last_alignment_reward = alignmentReward;
         }
         */
-        AddReward(newAlignmentReward);
-        //Debug.Log("Alignment reward: " + newAlignmentReward);
+        AddReward(alignmentReward);
+        //Debug.Log("Alignment reward: " + alignmentReward);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
