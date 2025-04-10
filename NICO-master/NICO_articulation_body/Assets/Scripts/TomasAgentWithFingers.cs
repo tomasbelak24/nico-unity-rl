@@ -345,7 +345,7 @@ public class TomasAgentWithFingers : Agent
         dot = Mathf.Clamp(dot, -1f, 1f);
         float angle = Mathf.Acos(dot);
 
-        float alignmentReward = Mathf.Pow(1f - (angle / Mathf.PI), k);
+        float alignmentReward = Mathf.Pow(1f - (Mathf.Abs(angle) / Mathf.PI), k);
         AddReward(alignmentReward);
         //Debug.Log("Alignment reward: " + alignmentReward);
 
