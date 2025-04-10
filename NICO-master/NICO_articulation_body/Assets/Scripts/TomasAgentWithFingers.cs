@@ -154,9 +154,9 @@ public class TomasAgentWithFingers : Agent
         // Write the header to the CSV file if it doesn't exist
         if (!File.Exists(logFilePath))
         {
-            Debug.Log($"Creating log file at {logFilePath}");
             File.AppendAllText(logFilePath, "AgentID,Episode,AverageAngle\n");
         }
+        Debug.Log($"Will be logging into file at {logFilePath}");
     }
 
     public override void OnEpisodeBegin()
