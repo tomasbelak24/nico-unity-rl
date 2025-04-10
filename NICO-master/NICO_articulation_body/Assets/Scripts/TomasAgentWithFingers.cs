@@ -8,6 +8,8 @@ using Unity.MLAgents.Sensors;
 using Random = UnityEngine.Random;
 using Grpc.Core;
 using System.Runtime.CompilerServices;
+using System.IO; // For file operations
+using System.Text; // For StringBuilder
 
 public class TomasAgentWithFingers : Agent
 {
@@ -42,7 +44,7 @@ public class TomasAgentWithFingers : Agent
     [Tooltip("Eye position")]
     public GameObject eye_position;
 
-    [Tooltip("The poweer exponent for the gaze alignment reward")]
+    [Tooltip("The power exponent for the gaze alignment reward")]
     public float k = 2f;
 
     [Tooltip("alpha coefficient used for alignment reward calculation")]
@@ -61,7 +63,10 @@ public class TomasAgentWithFingers : Agent
 
     private float last_dist;
 
-    
+    [Tooltip("Full path for logging angles (e.g., 'C:/Logs/angle_log.csv')")]
+    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log.csv";
+
+    private List<float> angleLog = new List<float>(); // List to store angle values
 
     private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
     {
@@ -145,10 +150,19 @@ public class TomasAgentWithFingers : Agent
 
         defaultTargetPosition = target.transform.position;
         last_dist = (target.transform.position - effector.transform.position).magnitude;
+
+        // Write the header to the CSV file if it doesn't exist
+        if (!File.Exists(logFilePath))
+        {
+            Debug.Log($"Creating log file at {logFilePath}");
+            File.AppendAllText(logFilePath, "AgentID,Episode,AverageAngle\n");
+        }
     }
 
     public override void OnEpisodeBegin()
     {
+        base.OnEpisodeBegin();
+
         // move target cube to a random position
 
         target.transform.position = defaultTargetPosition + new Vector3(
@@ -167,6 +181,15 @@ public class TomasAgentWithFingers : Agent
         changes = new List<float>(initial_changes);
         targets = new List<float>(initial_targets);
 
+        // Calculate the average angle and write it to the CSV file at the end of the episode
+        if (angleLog.Count > 0)
+        {
+            float averageAngle = angleLog.Average(); // Calculate the average
+            string csvLine = $"{GetInstanceID()},{CompletedEpisodes},{averageAngle}\n";
+            File.AppendAllText(logFilePath, csvLine);
+
+            angleLog.Clear(); // Clear the log for the next episode
+        }
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -345,6 +368,9 @@ public class TomasAgentWithFingers : Agent
         dot = Mathf.Clamp(dot, -1f, 1f);
         float angle = Mathf.Acos(dot);
 
+        // Log the angle value
+        angleLog.Add(angle);
+
         float alignmentReward = Mathf.Pow(1f - (Mathf.Abs(angle) / Mathf.PI), k);
         AddReward(alignmentReward);
         //Debug.Log("Alignment reward: " + alignmentReward);
@@ -374,6 +400,19 @@ public class TomasAgentWithFingers : Agent
         continuousActionsOut[4] = Input.GetAxis("Horizontal"); // krk
         continuousActionsOut[6] = -Input.GetAxis("Vertical"); // hlava
         //continuousActionsOut[7] = Input.GetAxis("Jump"); // 
+    }
+
+    private void OnDestroy()
+    {
+        // Write any remaining angle values to the CSV file when the agent is destroyed
+        if (angleLog.Count > 0)
+        {
+            float averageAngle = angleLog.Average(); // Calculate the average
+            string csvLine = $"{GetInstanceID()},TrainingEnd,{averageAngle}\n";
+            File.AppendAllText(logFilePath, csvLine);
+
+            angleLog.Clear(); // Clear the log to release memory
+        }
     }
 
 }
