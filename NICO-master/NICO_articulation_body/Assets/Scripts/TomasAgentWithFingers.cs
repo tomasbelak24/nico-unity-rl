@@ -42,6 +42,9 @@ public class TomasAgentWithFingers : Agent
     [Tooltip("Eye position")]
     public GameObject eye_position;
 
+    [Tooltip("The poweer exponent for the gaze alignment reward")]
+    public float k = 2f;
+
     [Tooltip("alpha coefficient used for alignment reward calculation")]
     public float alignment_alpha = 0.6f;
     private float last_alignment_reward = -100f;
@@ -57,6 +60,7 @@ public class TomasAgentWithFingers : Agent
     private List<int> finger_parts = new List<int>();
 
     private float last_dist;
+
     
 
     private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
@@ -336,11 +340,17 @@ public class TomasAgentWithFingers : Agent
         Vector3 worldRightVector = eye_position.transform.rotation * Vector3.right;
         Debug.DrawRay(eye_position.transform.position, worldRightVector, Color.green);
 
-        // Compute the angle in degrees
-        float cosAngle = Vector3.Dot(worldRightVector, directionToCube);
+        // Compute the angle in radians
+        float dot = Vector3.Dot(worldRightVector, directionToCube);
+        dot = Mathf.Clamp(dot, -1f, 1f);
+        float angle = Mathf.Acos(dot);
 
-        float alignmentReward = (cosAngle+1) /2; // Reward is in range [0, 1]
-        float newAlignmentReward = 0f;
+        float alignmentReward = Mathf.Pow(1f - (angle / Mathf.PI), k);
+        AddReward(alignmentReward);
+        //Debug.Log("Alignment reward: " + alignmentReward);
+
+
+        /*float newAlignmentReward = 0f;
 
         if (last_alignment_reward == -100f)
         {
@@ -355,6 +365,7 @@ public class TomasAgentWithFingers : Agent
         }
         AddReward(newAlignmentReward);
         //Debug.Log("Alignment reward: " + newAlignmentReward);
+        */
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
