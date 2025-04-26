@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/With RL TomasAgentWithFingers1 MultipleAgents.unity
+    guid: b687b5dda34e16a45a9b37e2d6f93b69
+  - enabled: 1
+    path: Assets/Scenes/With RL TomasAgentWithFingers1 1.unity
+    guid: 4e523920a601f7342a56e8175988e4f5
   m_configObjects: {}

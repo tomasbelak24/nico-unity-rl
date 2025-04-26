@@ -45,7 +45,7 @@ public class TomasAgentWithFingers : Agent
     public GameObject eye_position;
 
     [Tooltip("The power exponent for the gaze alignment reward")]
-    public float k = 2f;
+    private float k = 6f;
 
     [Tooltip("alpha coefficient used for alignment reward calculation")]
     public float alignment_alpha = 0.6f;
@@ -64,7 +64,7 @@ public class TomasAgentWithFingers : Agent
     private float last_dist;
 
     [Tooltip("Full path for logging angles (e.g., 'C:/Logs/angle_log.csv')")]
-    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log.csv";
+    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log_k6.csv";
 
     private List<float> angleLog = new List<float>(); // List to store angle values
 
@@ -157,6 +157,7 @@ public class TomasAgentWithFingers : Agent
             File.AppendAllText(logFilePath, "AgentID,Episode,AverageAngle\n");
         }
         Debug.Log($"Will be logging into file at {logFilePath}");
+        Debug.Log($"k={k}");
     }
 
     public override void OnEpisodeBegin()
