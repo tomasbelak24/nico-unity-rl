@@ -64,9 +64,10 @@ public class TomasAgentWithFingers : Agent
     private float last_dist;
 
     [Tooltip("Full path for logging angles (e.g., 'C:/Logs/angle_log.csv')")]
-    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log_k6.csv";
+    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log_k6_last10percent.csv";
 
     private List<float> angleLog = new List<float>(); // List to store angle values
+    private List<float> last10PercentAngles = new List<float>();
 
     private void GetLimits(ArticulationBody root, List<float> llimits, List<float> hlimits)
     {
@@ -154,7 +155,7 @@ public class TomasAgentWithFingers : Agent
         // Write the header to the CSV file if it doesn't exist
         if (!File.Exists(logFilePath))
         {
-            File.AppendAllText(logFilePath, "AgentID,Episode,AverageAngle\n");
+            File.AppendAllText(logFilePath, "AgentID,Episode,LastNthStep,Angle\n");
         }
         Debug.Log($"Will be logging into file at {logFilePath}");
         Debug.Log($"k={k}");
@@ -183,14 +184,29 @@ public class TomasAgentWithFingers : Agent
         targets = new List<float>(initial_targets);
 
         // Calculate the average angle and write it to the CSV file at the end of the episode
-        if (angleLog.Count > 0)
+        /*if (angleLog.Count > 0)
         {
             float averageAngle = angleLog.Average(); // Calculate the average
             string csvLine = $"{GetInstanceID()},{CompletedEpisodes},{averageAngle}\n";
             File.AppendAllText(logFilePath, csvLine);
 
-            angleLog.Clear(); // Clear the log for the next episode
+            angleLog.Clear();
         }
+        */
+        if (last10PercentAngles.Count > 0)
+        {
+            StringBuilder csvLines = new StringBuilder();
+            for (int i = 0; i < last10PercentAngles.Count; i++)  
+            {
+                string csvLine = $"{GetInstanceID()},{CompletedEpisodes},{i},{last10PercentAngles[i]}\n";
+                csvLines.Append(csvLine);
+            }
+            File.AppendAllText(logFilePath, csvLines.ToString());
+
+            last10PercentAngles.Clear(); // Clear the log for the next episode
+        }
+        //Debug.Log($"StepCount: {StepCount}");
+        //Debug.Log($"Episode {CompletedEpisodes} completed. Last 10% angles logged.");
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -370,7 +386,15 @@ public class TomasAgentWithFingers : Agent
         float angle = Mathf.Acos(dot);
 
         // Log the angle value
-        angleLog.Add(angle);
+        //angleLog.Add(angle);
+        
+        int maxLast10PercentCount = Mathf.CeilToInt(0.1f * MaxStep); // Calculate 10% of MaxStep
+        last10PercentAngles.Add(angle);
+        
+        if (last10PercentAngles.Count > maxLast10PercentCount)
+        {
+            last10PercentAngles.RemoveAt(0); // Remove the oldest angle to keep the size within 10%
+        }
 
         float alignmentReward = Mathf.Pow(1f - (Mathf.Abs(angle) / Mathf.PI), k);
         AddReward(alignmentReward);
@@ -403,7 +427,7 @@ public class TomasAgentWithFingers : Agent
         //continuousActionsOut[7] = Input.GetAxis("Jump"); // 
     }
 
-    private void OnDestroy()
+    /*private void OnDestroy()
     {
         // Write any remaining angle values to the CSV file when the agent is destroyed
         if (angleLog.Count > 0)
@@ -415,6 +439,6 @@ public class TomasAgentWithFingers : Agent
             angleLog.Clear(); // Clear the log to release memory
         }
     }
-
+    */
 }
 
