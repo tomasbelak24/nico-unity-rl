@@ -45,7 +45,7 @@ public class TomasAgentWithFingers : Agent
     public GameObject eye_position;
 
     [Tooltip("The power exponent for the gaze alignment reward")]
-    private float k = 6f;
+    private float k = 8f;
 
     [Tooltip("alpha coefficient used for alignment reward calculation")]
     public float alignment_alpha = 0.6f;
@@ -64,7 +64,7 @@ public class TomasAgentWithFingers : Agent
     private float last_dist;
 
     [Tooltip("Full path for logging angles (e.g., 'C:/Logs/angle_log.csv')")]
-    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log_k6_last10percent.csv";
+    private string logFilePath = "C:/Users/tomin/OneDrive/Desktop/Matfyz UK/01_DIPLOMOVKA/nico_unity/NICO-master/RL_train/angle_logs/angle_log_k8_more_observations.csv";
 
     private List<float> angleLog = new List<float>(); // List to store angle values
     private List<float> last10PercentAngles = new List<float>();
@@ -243,6 +243,18 @@ public class TomasAgentWithFingers : Agent
         sensor.AddObservation(target.transform.position - effector.transform.position);
         Vector3 relativeTargetPosition = target.transform.position - eye_position.transform.position;
         sensor.AddObservation(relativeTargetPosition.normalized); // 3d vector from head to target, normalized because magnitude is not important
+
+        Vector3 directionToCube = (target.transform.position - eye_position.transform.position).normalized;
+        Vector3 worldRightVector = eye_position.transform.rotation * Vector3.right;
+        float dot = Vector3.Dot(worldRightVector, directionToCube);
+        dot = Mathf.Clamp(dot, -1f, 1f);
+        float angle = Mathf.Acos(dot);
+        sensor.AddObservation(angle / Mathf.PI); // Normalized error angle
+
+        // Add binary indicator for small angle (< 3 degrees)
+        sensor.AddObservation(angle < Mathf.Deg2Rad * 3 ? 1f : 0f);
+        sensor.AddObservation(changes[1]); // Head
+        sensor.AddObservation(changes[3]); // Neck
     }
 
 
@@ -384,6 +396,20 @@ public class TomasAgentWithFingers : Agent
         float dot = Vector3.Dot(worldRightVector, directionToCube);
         dot = Mathf.Clamp(dot, -1f, 1f);
         float angle = Mathf.Acos(dot);
+        float headNeckPenalty = 0f;
+
+          if (angle < Mathf.Deg2Rad * 3)
+        {
+            // Penalize head and neck movement
+            headNeckPenalty = -0.1f * (Mathf.Abs(changes[1]) + Mathf.Abs(changes[3])); // Adjust penalty weight as needed
+            //AddReward(headNeckPenalty);
+        }
+
+        float alignmentReward = Mathf.Pow(1f - (Mathf.Abs(angle) / Mathf.PI), k);
+        
+        float normalizedHeadNeckPenalty = Mathf.Clamp(headNeckPenalty, -1f, 0f);
+        float totalReward = Mathf.Clamp(alignmentReward + normalizedHeadNeckPenalty, 0f, 1f);
+        AddReward(totalReward);
 
         // Log the angle value
         //angleLog.Add(angle);
@@ -396,8 +422,6 @@ public class TomasAgentWithFingers : Agent
             last10PercentAngles.RemoveAt(0); // Remove the oldest angle to keep the size within 10%
         }
 
-        float alignmentReward = Mathf.Pow(1f - (Mathf.Abs(angle) / Mathf.PI), k);
-        AddReward(alignmentReward);
         //Debug.Log("Alignment reward: " + alignmentReward);
 
 
